@@ -35,3 +35,30 @@
 # Node Docker Good Defaults sample project on GitHub to change this Dockerfile for 
 # better local development with more advanced topics
 # https://github.com/BretFisher/node-docker-good-defaults
+
+# base image: node 6.x (alpine distro)
+FROM node:6-alpine
+
+# install tini and create dir to store source code
+RUN apk add --update tini \
+    && mkdir -p /usr/src/app
+
+# move to source code dir
+WORKDIR /usr/src/app
+
+# copy the package.json from local pc to container
+COPY package.json package.json
+
+# install node dependencies and clean cache
+RUN npm install \
+    && npm cache clean --force
+
+# copy source code into current working dir
+COPY . .
+
+# run node app
+CMD [ "/sbin/tini",  "--", "node", "./bin/www" ]
+
+# the express server listens on port 3000, so expose on virtual network so we can later publish
+# on port 80 of local host
+EXPOSE 3000
