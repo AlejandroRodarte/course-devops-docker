@@ -1,1 +1,33 @@
 # create your drupal and postgres config here, based off the last assignment
+# version
+version: '2'
+
+services:
+    drupal: # custom drupal image built with Dockerfile
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: custom-drupal
+        ports: 
+            - "8080:80" # --publish 8080:80
+        volumes: # use named volumes to store unique data
+            - drupal-modules:/var/www/html/modules
+            - drupal-profiles:/var/www/html/profiles
+            - drupal-sites:/var/www/html/sites
+            - drupal-themes:/var/www/html/themes
+        depends_on: # depends on PostgreSQL db
+            - postgres
+    postgres: # db
+        image: postgres:12.1
+        environment: # set password
+            POSTGRES_PASSWORD: mypassword
+        volumes: # set named volume
+            - drupal-data:/var/lib/postgresql/data
+
+# named volumes
+volumes: 
+    drupal-modules:
+    drupal-profiles:
+    drupal-sites:
+    drupal-themes:
+    drupal-data:
